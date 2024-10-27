@@ -14,9 +14,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
-
+import { useToast } from "@/hooks/use-toast";
+import { submitFeedback } from "./utils";
 type DetailsProps = {
-  name: string;
+  name?: string;
   logo?: string;
   message?: string;
 };
@@ -30,60 +31,65 @@ type FeedbackFormProps = {
   spaceId: string;
 };
 
+type SubmitResponse = {
+  type: "success" | "error" | "idle";
+  message: string;
+};
+
 export default function FeedbackForm({
   nameRequired,
   starRatingRequired,
   spaceDetails,
+  spaceId,
 }: FeedbackFormProps) {
   const [name, setName] = useState("");
   const [feedback, setFeedback] = useState("");
   const [rating, setRating] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const { toast } = useToast();
   const { name: spaceName, logo, message } = spaceDetails;
-
+  const [responseMessage, setResponseMessage] = useState<SubmitResponse>({
+    message: "",
+    type: "idle",
+  });
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isSubmitting) return;
 
     // Custom validation (uncomment toast code if implemented):
-    // if (nameRequired && !name.trim()) {
-    //   toast({
-    //     title: "Error",
-    //     description: "Please enter your name",
-    //     variant: "destructive",
-    //   });
-    //   return;
-    // }
+    if (nameRequired && !name.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter your name",
+        variant: "destructive",
+      });
+      return;
+    }
 
     // Additional logic for submitting feedback would go here.
 
     setIsSubmitting(true);
     try {
-      // Replace with your submit feedback function
-      // await submitFeedback({
-      //   spaceId,
-      //   feedback: feedback.trim(),
-      //   stars: starRatingRequired ? rating : undefined,
-      //   name: nameRequired ? name.trim() : undefined,
-      // });
-
-      // Uncomment toast notification:
-      // toast({
-      //   title: "Success",
-      //   description: "Thank you for your feedback!"
-      // });
+      const response = await submitFeedback({
+        spaceId,
+        feedback: feedback.trim(),
+        stars: starRatingRequired ? rating : undefined,
+        name: nameRequired ? name.trim() : undefined,
+      });
+      setResponseMessage({
+        message: response?.message || "Feedback saved",
+        type: "success",
+      });
 
       setName("");
       setFeedback("");
       setRating(1);
     } catch (error) {
-      // Handle error (toast example shown):
-      // toast({
-      //   title: "Error",
-      //   description: error instanceof Error ? error.message : "Failed to submit feedback",
-      //   variant: "destructive",
-      // });
+      setResponseMessage({
+        message:
+          (error as Record<string, string>).message || "Some error occured",
+        type: "error",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -92,12 +98,22 @@ export default function FeedbackForm({
   return (
     <Card className="max-w-2xl w-full mx-auto">
       <CardHeader className="text-center">
-        <div className="w-20 h-20 mx-auto my-7">
-          <Avatar className="rounded-full">
-            <AvatarImage src={logo} alt={spaceName} className="rounded-full" />
-            <AvatarFallback>{spaceName.slice(0, 2).toUpperCase()}</AvatarFallback>
-          </Avatar>
-        </div>
+        {spaceDetails?.logo ? (
+          <div className="w-20 h-20 mx-auto my-7">
+            <Avatar className="rounded-full">
+              <AvatarImage
+                src={logo}
+                alt={spaceName}
+                className="rounded-full"
+              />
+              {spaceName ? (
+                <AvatarFallback>
+                  {spaceName.slice(0, 2).toUpperCase()}
+                </AvatarFallback>
+              ) : null}
+            </Avatar>
+          </div>
+        ) : null}
         <CardTitle className="text-3xl font-bold">{spaceName}</CardTitle>
         <CardDescription>{message}</CardDescription>
       </CardHeader>
@@ -144,7 +160,9 @@ export default function FeedbackForm({
                   >
                     <Star
                       className={`w-8 h-8 transition-colors ${
-                        star <= rating ? "text-orange-400" : "text-gray-300"
+                        star <= rating
+                          ? "text-orange-400 fill-orange-400"
+                          : "text-gray-300"
                       }`}
                     />
                   </button>
@@ -163,6 +181,17 @@ export default function FeedbackForm({
               "Submit Feedback"
             )}
           </Button>
+          {responseMessage?.message && (
+            <div
+              className={`mt-4 p-4 rounded ${
+                responseMessage.type === "success"
+                  ? "bg-green-100 text-green-700"
+                  : "bg-red-100 text-red-700"
+              }`}
+            >
+              {responseMessage.message}
+            </div>
+          )}
         </form>
       </CardContent>
     </Card>

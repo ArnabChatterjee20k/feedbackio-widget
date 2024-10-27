@@ -6,6 +6,6 @@ import FeedbackButton from './widget/Feedback-Button.tsx'
 
 createRoot(document.getElementById('feedbackio-feedback-widget')!).render(
   <StrictMode>
-    <FeedbackButton/>    
+    <FeedbackButton spaceId='671a2e92000e7713cdea'/>
   </StrictMode>,
 )
