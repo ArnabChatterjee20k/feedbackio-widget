@@ -19,6 +19,7 @@ interface WidgetConfig {
   spaceImage?: string;
   butonText?: string;
   authRedirect?: string;
+  className?: string;
 }
 
 type FeedbackState =
@@ -36,6 +37,7 @@ export default function FeedbackButton({
   spaceImage,
   butonText,
   authRedirect,
+  className,
 }: WidgetConfig) {
   const [errorMessage, setErrorMessage] = useState("");
   const [state, setState] = useState<FeedbackState>("idle");
@@ -80,7 +82,9 @@ export default function FeedbackButton({
   return (
     <Dialog>
       <DialogTrigger>
-        <Button>{butonText || "Share your valuable feedback"}</Button>
+        <Button className={className}>
+          {butonText || "Share your valuable feedback"}
+        </Button>
       </DialogTrigger>
       {state === "success" ? (
         <DialogContent className="bg-transparent border-transparent">
@@ -99,7 +103,7 @@ export default function FeedbackButton({
         <DialogContent className="bg-white">
           <DialogHeader>
             <DialogDescription className="flex justify-center">
-              {state === "auth" && <Signin authRedirect={authRedirect}/>}
+              {state === "auth" && <Signin authRedirect={authRedirect} />}
               {state === "loading" && <Loader />}
               {(state === "error" || state === "rate limit") && (
                 <Error message={errorMessage} />

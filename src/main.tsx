@@ -12,6 +12,7 @@ const getDatasetAttributes = (element: HTMLElement) => {
     spaceImage: element.dataset.spaceImage,
     butonText: element.dataset.butonText,
     authRedirect: element.dataset.authRedirect,
+    className:element.dataset.classname
   };
 };
 const atributes = getDatasetAttributes(container)
