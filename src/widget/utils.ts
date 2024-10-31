@@ -27,7 +27,7 @@ export async function fetchSettings(spaceId: string): Promise<FETCHRESULT> {
 
   const res = await fetch(url);
   const data: RESPONSE = await res.json();
-  if (res.statusText.toLowerCase() !== "ok" || !data.settings) {
+  if (res.status !== 200 || !data.settings) {
     console.log({ message: data.message });
     return { settings: null, error: data.message, type: data?.type };
   }
