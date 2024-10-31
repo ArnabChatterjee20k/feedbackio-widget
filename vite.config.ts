@@ -14,9 +14,9 @@ export default defineConfig({
       // input:  'src/main.tsx',
       input:  'src/wall-of-fame.main.tsx',
       output:{
-        entryFileNames:"bundle.js",
-        chunkFileNames:"bundle.js",
-        assetFileNames:"style.css"
+        entryFileNames:"wall-of-fame-bundle.js",
+        chunkFileNames:"wall-of-fame-bundle.js",
+        assetFileNames:"wall-of-fame-style.css"
       }
     }
   }

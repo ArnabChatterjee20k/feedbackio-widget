@@ -10,6 +10,7 @@ export function WallOfFameWidget({ projectId }: { projectId: string }) {
   );
   useEffect(() => {
     getWallOfFame(projectId).then((data) => {
+      console.log(data)
       setFeedbacks(data);
     });
   }, []);
@@ -28,10 +29,12 @@ function WallOfFame({
   feedbacks: Record<string, string>[];
   projectId: string;
 }) {
+  console.log({feedbacks})
+  if(!feedbacks) return
   return (
     <section className="flex flex-1 flex-col gap-4 p-4 pt-0">
       <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 max-w-[1500px] mx-auto py-5">
-        {feedbacks?.map((feedback) => {
+        {feedbacks && feedbacks?.map((feedback) => {
           return feedback?.type === "twitter" ||
             feedback?.type === "linkedin" ? (
             <div className="max-w-sm mb-2">

@@ -100,9 +100,8 @@ export async function getWallOfFame(spaceId: string) {
 
   const res = await fetch(url);
   const data = await res.json();
-  if (res.statusText.toLowerCase() !== "ok" || !data.feedbacks) {
-    console.log({ message: data.message });
-    return { feedbacks: null, type: data?.type };
+  if (res.status !== 200) {
+    return { feedbacks: null };
   }
   return data.feedbacks;
 }
