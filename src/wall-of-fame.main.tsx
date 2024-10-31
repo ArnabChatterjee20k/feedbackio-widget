@@ -1,11 +1,17 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "./index.css";
 
-import { WallOfFameWidget } from './widget/Wall-of-fame.tsx'
-
-createRoot(document.getElementById('feedbackio-feedback-widget')!).render(
+import { WallOfFameWidget } from "./widget/Wall-of-fame.tsx";
+const getDatasetAttributes = (element: HTMLElement) => {
+  return {
+    projectId: element.dataset.spaceid || "",
+  };
+};
+const container = document.getElementById("feedbackio-wall-of-fame")!;
+const attributes = getDatasetAttributes(container);
+createRoot(container).render(
   <StrictMode>
-    <WallOfFameWidget projectId='6720788b0025006c6d47'/>
-  </StrictMode>,
-)
+    <WallOfFameWidget {...attributes} />
+  </StrictMode>
+);
