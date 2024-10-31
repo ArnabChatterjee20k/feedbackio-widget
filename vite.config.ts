@@ -12,6 +12,7 @@ export default defineConfig({
   build:{
     rollupOptions:{
       input:  'src/main.tsx',
+      // input:  'src/wall-of-fame.main.tsx',
       output:{
         entryFileNames:"bundle.js",
         chunkFileNames:"bundle.js",

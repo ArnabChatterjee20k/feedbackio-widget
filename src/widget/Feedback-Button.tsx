@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -33,22 +33,11 @@ export default function FeedbackButton({
   const [errorMessage, setErrorMessage] = useState("");
   const [state, setState] = useState<FeedbackState>("idle");
   const [widgetOptions, setWidgetOptions] = useState({});
-  const abortControllerRef = useRef<AbortController | null>(null);
   
   const getFeedbackFormSettings = async () => {
-    // Cancel any ongoing requests
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
-    
-    // Create new abort controller for this request
-    abortControllerRef.current = new AbortController();
-    
     try {
       setState("loading");
-      const { settings, error, type } = await fetchSettings(spaceId, {
-        signal: abortControllerRef.current.signal
-      });
+      const { settings, error, type } = await fetchSettings(spaceId);
       
       if (!settings || error) {
         setState(type === "auth" ? "auth" : type === "rate limit" ? "rate limit" : "error");
@@ -59,9 +48,6 @@ export default function FeedbackButton({
       setWidgetOptions(settings);
       setState("success");
     } catch (error) {
-      if (error.name === 'AbortError') {
-        return; // Request was cancelled, ignore error
-      }
       setState("error");
       setErrorMessage("Failed to load feedback form");
     }
@@ -76,13 +62,6 @@ export default function FeedbackButton({
     }
     
     getFeedbackFormSettings();
-
-    // Cleanup function to cancel any pending requests
-    return () => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-    };
   }, [spaceId, spaceName, spaceDescription, spaceImage]);
 
   return (
@@ -92,6 +71,7 @@ export default function FeedbackButton({
       </DialogTrigger>
       {state === "success" ? (
         <DialogContent className="bg-transparent border-transparent">
+          {/* @ts-ignore */}
           <FeedbackForm
             {...widgetOptions}
             spaceDetails={{

@@ -93,3 +93,16 @@ export async function submitFeedback({
     throw error;
   }
 }
+
+export async function getWallOfFame(spaceId: string) {
+  const host = import.meta.env.VITE_API!;
+  const url = `${host}/api/${spaceId}/wall-of-fame`;
+
+  const res = await fetch(url);
+  const data = await res.json();
+  if (res.statusText.toLowerCase() !== "ok" || !data.feedbacks) {
+    console.log({ message: data.message });
+    return { feedbacks: null, type: data?.type };
+  }
+  return data.feedbacks;
+}
