@@ -3,9 +3,20 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 
 import FeedbackButton from './widget/Feedback-Button.tsx'
-
-createRoot(document.getElementById('feedbackio-feedback-widget')!).render(
+const container = document.getElementById('feedbackio-feedback-widget')!
+const getDatasetAttributes = (element: HTMLElement) => {
+  return {
+    spaceId: element.dataset.spaceid || '',
+    spaceName: element.dataset.spaceName,
+    spaceDescription: element.dataset.spaceDescription,
+    spaceImage: element.dataset.spaceImage,
+    butonText: element.dataset.butonText,
+    authRedirect: element.dataset.authRedirect,
+  };
+};
+const atributes = getDatasetAttributes(container)
+createRoot(container).render(
   <StrictMode>
-    <FeedbackButton spaceId='671a2e92000e7713cdea'/>
+    <FeedbackButton {...atributes} />
   </StrictMode>,
 )

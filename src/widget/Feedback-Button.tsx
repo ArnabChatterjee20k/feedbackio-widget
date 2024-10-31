@@ -21,7 +21,13 @@ interface WidgetConfig {
   authRedirect?: string;
 }
 
-type FeedbackState = "success" | "loading" | "error" | "auth" | "rate limit" | "idle";
+type FeedbackState =
+  | "success"
+  | "loading"
+  | "error"
+  | "auth"
+  | "rate limit"
+  | "idle";
 
 export default function FeedbackButton({
   spaceId,
@@ -29,22 +35,29 @@ export default function FeedbackButton({
   spaceDescription,
   spaceImage,
   butonText,
+  authRedirect,
 }: WidgetConfig) {
   const [errorMessage, setErrorMessage] = useState("");
   const [state, setState] = useState<FeedbackState>("idle");
   const [widgetOptions, setWidgetOptions] = useState({});
-  
+
   const getFeedbackFormSettings = async () => {
     try {
       setState("loading");
       const { settings, error, type } = await fetchSettings(spaceId);
-      
+
       if (!settings || error) {
-        setState(type === "auth" ? "auth" : type === "rate limit" ? "rate limit" : "error");
+        setState(
+          type === "auth"
+            ? "auth"
+            : type === "rate limit"
+            ? "rate limit"
+            : "error"
+        );
         setErrorMessage(error || "Some problem occurred");
         return;
       }
-      
+
       setWidgetOptions(settings);
       setState("success");
     } catch (error) {
@@ -56,11 +69,11 @@ export default function FeedbackButton({
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const token = params.get("token");
-    
+
     if (token) {
       setLocalStorage(decodeURIComponent(token));
     }
-    
+
     getFeedbackFormSettings();
   }, [spaceId, spaceName, spaceDescription, spaceImage]);
 
@@ -86,7 +99,7 @@ export default function FeedbackButton({
         <DialogContent className="bg-white">
           <DialogHeader>
             <DialogDescription className="flex justify-center">
-              {state === "auth" && <Signin />}
+              {state === "auth" && <Signin authRedirect={authRedirect}/>}
               {state === "loading" && <Loader />}
               {(state === "error" || state === "rate limit") && (
                 <Error message={errorMessage} />
@@ -119,13 +132,17 @@ function Error({ message }: { message?: string }) {
   );
 }
 
-function Signin() {
+function Signin({ authRedirect }: { authRedirect?: string }) {
   return (
     <div className="flex flex-col items-center space-y-2">
-      <span className="text-xl">Please signin first to submit your feedback</span>
-      <GoogleButton 
+      <span className="text-xl">
+        Please signin first to submit your feedback
+      </span>
+      <GoogleButton
         onClick={() => {
-          window.location.href = `${import.meta.env.VITE_API}/api/identity?next=${window.location.origin}`;
+          window.location.href = `${
+            import.meta.env.VITE_API
+          }/api/identity?next=${authRedirect || window.location.href}`;
         }}
       />
     </div>
